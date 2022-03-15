@@ -44,7 +44,9 @@ TEST_CASE("PTree::Constructor", "[weight=1][part=ptree]") {
   *px01 = HSLAPixel(350, 0.8, 0.2);    *px11 = HSLAPixel(240, 0.1, 0.8);     *px21 = HSLAPixel(320, 0.7, 0.4);
 
   // call the tree constructor
+  cout<<"CALLING constructor"<<endl;
   PTree tree(source);
+  cout<<"FINISHED constructor"<<endl;
 
   // check the node contents
   Node* nd_root = tree.GetRoot();

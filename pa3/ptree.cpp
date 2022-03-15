@@ -54,8 +54,55 @@ void PTree::Copy(const PTree& other) {
 *  RETURN: pointer to the fully constructed Node
 */
 Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned int w, unsigned int h) {
-  // replace the line below with your implementation
-  return nullptr;
+  if(h == 0 || w == 0) {
+    return nullptr;
+  }
+  if(h == 1 && w == 1) {
+    Node* leaf = new Node();
+    leaf->upperleft = ul;
+    leaf->width = 1;
+    leaf->height = 1;
+    leaf->A = nullptr;
+    leaf->B = nullptr;
+    leaf->avg = im.getPixel(ul.first, ul.second);
+    return leaf;
+  }
+  if(w > h || w == h) {
+    Node* cur_node = new Node();
+    //vertical split
+    unsigned int a_width = w / 2;
+    unsigned int b_width = w - a_width;
+    cur_node->upperleft = ul;
+    cur_node->width = w;
+    cur_node->height = h;
+    double lx = Deg2X(im.getPixel(ul.first, ul.second).h);
+    double rx = Deg2X(im.getPixel(ul.first + a_width, ul.secnd));
+    double ly = Deg2X(im.getPixel(ul.first, ul.second).h);
+    double ry = Deg2X(im.getPixel(ul.first + a_width, ul.secnd));
+    double avgx = (lx + rx) / 2.0;
+    double avgy = (ly + ry) / 2.0;
+    double hue = XY2Deg(avgx, avgy);
+    HSLAPixel pix;
+    pix.h = hue;
+
+    cur_node->A = BuildNode(im, {ul.first, ul.second}, a_width, h);
+    cur_node->B = BuildNode(im, {ul.first + a_width, ul.second}, b_width, h);
+
+    
+    return cur_node;
+  }
+  else if (h > w) {
+    //horizontal split
+    Node* cur_node = new Node();
+    unsigned int a_height = h / 2;
+    unsigned int b_height = h - a_height;
+    cur_node->upperleft = ul;
+    cur_node->width = w;
+    cur_node->height = h;
+    cur_node->A = BuildNode(im, {ul.first, ul.second}, w, a_height);
+    cur_node->B = BuildNode(im,  {ul.first, ul.second + a_height}, w, b_height);
+    return cur_node;
+  }
 }
 
 ////////////////////////////////
@@ -108,8 +155,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
 *  POST:  The newly constructed tree contains the PNG's pixel data in each leaf node.
 */
 PTree::PTree(PNG& im) {
-  // add your implementation below
-  
+  root = BuildNode(im, {0, 0}, im.width(), im.height());
 }
 
 /*
@@ -120,8 +166,20 @@ PTree::PTree(PNG& im) {
 *  POST:  This tree is constructed as a physically separate copy of other tree.
 */
 PTree::PTree(const PTree& other) {
-  // add your implementation below
-  
+  root = CopyNode(other.root);
+}
+
+Node* PTree::CopyNode(Node* node) {
+  if(node == nullptr) {
+    return nullptr;
+  }
+  Node* cur = new Node();
+  cur->height = node->height;
+  cur->width = node->width;
+  cur->upperleft = node->upperleft;
+  cur->A = CopyNode(node->A);
+  cur->B = CopyNode(node->B);
+  return cur;
 }
 
 /*
