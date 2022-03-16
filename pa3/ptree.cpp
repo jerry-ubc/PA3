@@ -75,10 +75,12 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     cur_node->upperleft = ul;
     cur_node->width = w;
     cur_node->height = h;
-    double lx = Deg2X(im.getPixel(ul.first, ul.second)->h);
-    double rx = Deg2X(im.getPixel(ul.first + a_width, ul.second)->h);
-    double ly = Deg2X(im.getPixel(ul.first, ul.second)->h);
-    double ry = Deg2X(im.getPixel(ul.first + a_width, ul.second)->h);
+    HSLAPixel* lp = im.getPixel(ul.first, ul.second);
+    HSLAPixel* rp = im.getPixel(ul.first + a_width, ul.second);
+    double lx = Deg2X(lp->h);
+    double rx = Deg2X(rp->h);
+    double ly = Deg2X(lp->h);
+    double ry = Deg2X(rp->h);
     double avgx = (lx + rx) / 2.0;
     double avgy = (ly + ry) / 2.0;
     double hue = XY2Deg(avgx, avgy);
@@ -87,8 +89,11 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
 
     cur_node->A = BuildNode(im, {ul.first, ul.second}, a_width, h);
     cur_node->B = BuildNode(im, {ul.first + a_width, ul.second}, b_width, h);
+    pix.s = (lp->s + rp->s) / 2.0;
+    pix.l = (lp->l + rp->l) / 2.0;
+    pix.a = (lp->a + rp->a) / 2.0;
+    cur_node->avg = pix;
 
-    
     return cur_node;
   }
   else if (h > w) {
@@ -99,8 +104,25 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     cur_node->upperleft = ul;
     cur_node->width = w;
     cur_node->height = h;
+    HSLAPixel* up = im.getPixel(ul.first, ul.second);
+    HSLAPixel* dp = im.getPixel(ul.first, ul.second + a_height);
+    double ux = Deg2X(up->h);
+    double dx = Deg2X(dp->h);
+    double uy = Deg2X(up->h);
+    double dy = Deg2X(dp->h);
+    double avgx = (ux + dx) / 2.0;
+    double avgy = (uy + dy) / 2.0;
+    double hue = XY2Deg(avgx, avgy);
+    HSLAPixel pix;
+    pix.h = hue;
+
     cur_node->A = BuildNode(im, {ul.first, ul.second}, w, a_height);
     cur_node->B = BuildNode(im,  {ul.first, ul.second + a_height}, w, b_height);
+    pix.s = (up->s + dp->s) / 2.0;
+    pix.l = (up->l + dp->l) / 2.0;
+    pix.a = (up->a + dp->a) / 2.0;
+    cur_node->avg = pix;
+
     return cur_node;
   }
 }
@@ -219,7 +241,8 @@ PTree::~PTree() {
 *  RETURN: A PNG image of appropriate dimensions and coloured using the tree's leaf node colour data
 */
 PNG PTree::Render() const {
-  // replace the line below with your implementation
+  PNG png;
+  //IMPLEMENT THIS!
   return PNG();
 }
 
@@ -251,8 +274,13 @@ void PTree::Prune(double tolerance) {
 *  You may want to add a recursive helper function for this!
 */
 int PTree::Size() const {
-  // replace the line below with your implementation
-  return -1;
+  return 1 + TreeSize(root->A) + TreeSize(root->B);
+}
+
+int PTree::TreeSize(Node* node) const {
+  if(node == nullptr) 
+    return 0;
+  return 1 + TreeSize(node->A) + TreeSize(node->B);
 }
 
 /*

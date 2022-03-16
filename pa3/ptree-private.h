@@ -21,5 +21,7 @@
 /////////////////////////////////////////////////
 
 Node* CopyNode(Node* node);
+int TreeSize(Node* node) const;
+void Wender(PNG)
 
 #endif
