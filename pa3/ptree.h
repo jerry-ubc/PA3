@@ -51,8 +51,6 @@ class PTree {
     // PTree private member functions
     /////////////////////////////////
 
-    Node* CopyNode(Node* node);
-
     /*
     *  Destroys all dynamically allocated memory associated with the current PTree object.
     *  You may want to add a recursive helper function for this!

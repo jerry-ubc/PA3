@@ -64,7 +64,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     leaf->height = 1;
     leaf->A = nullptr;
     leaf->B = nullptr;
-    leaf->avg = im.getPixel(ul.first, ul.second);
+    leaf->avg = *(im.getPixel(ul.first, ul.second));
     return leaf;
   }
   if(w > h || w == h) {
@@ -75,10 +75,10 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     cur_node->upperleft = ul;
     cur_node->width = w;
     cur_node->height = h;
-    double lx = Deg2X(im.getPixel(ul.first, ul.second).h);
-    double rx = Deg2X(im.getPixel(ul.first + a_width, ul.secnd));
-    double ly = Deg2X(im.getPixel(ul.first, ul.second).h);
-    double ry = Deg2X(im.getPixel(ul.first + a_width, ul.secnd));
+    double lx = Deg2X(im.getPixel(ul.first, ul.second)->h);
+    double rx = Deg2X(im.getPixel(ul.first + a_width, ul.second)->h);
+    double ly = Deg2X(im.getPixel(ul.first, ul.second)->h);
+    double ry = Deg2X(im.getPixel(ul.first + a_width, ul.second)->h);
     double avgx = (lx + rx) / 2.0;
     double avgy = (ly + ry) / 2.0;
     double hue = XY2Deg(avgx, avgy);
