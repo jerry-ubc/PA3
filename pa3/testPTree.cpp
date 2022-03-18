@@ -370,6 +370,8 @@ TEST_CASE("PTree::FlipHorizontal_small", "[weight=1][part=ptree]") {
 
   // call the tree constructor
   PTree tree(source);
+  PNG out = tree.Render();
+  out.writeToFile("images/OWN_TEST.png");
 
   // FlipHorizontal tree
   tree.FlipHorizontal();
