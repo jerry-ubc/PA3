@@ -279,10 +279,10 @@ void PTree::Prune(double tolerance) {
 *  You may want to add a recursive helper function for this!
 */
 int PTree::Size() const {
-  return 1 + TreeSize(root->A) + TreeSize(root->B);
+  return TreeSize(root);
 }
 
-int PTree::TreeSize(Node* node) const {
+int PTree::TreeSize(const Node* node) const {
   if(node == nullptr) 
     return 0;
   return 1 + TreeSize(node->A) + TreeSize(node->B);
