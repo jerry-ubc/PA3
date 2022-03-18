@@ -215,7 +215,7 @@ TEST_CASE("PTree::Constructor", "[weight=1][part=ptree]") {
 }
 
 TEST_CASE("PTree::Size_NumLeaves", "[weight=1][part=ptree]") {
-  //cout << "Testing PTree Size, NumLeaves..." << endl;
+  cout << "Testing PTree Size, NumLeaves..." << endl;
 
   // manually create a PNG, 3x2
   PNG source;
@@ -234,14 +234,15 @@ TEST_CASE("PTree::Size_NumLeaves", "[weight=1][part=ptree]") {
   PTree tree(source);
 
   int treesize = tree.Size();
+  cout << "tree size is: " << treesize << endl;
   int treenumleaves = tree.NumLeaves();
-
+  cout << "number of leaves: " << treenumleaves << endl;
   REQUIRE(treesize == 11);
   REQUIRE(treenumleaves == 6);
 }
 
 TEST_CASE("PTree::CopyConstructor_operator=", "[weight=1][part=ptree]") {
-  //cout << "Testing PTree CopyConstructor_operator=..." << endl;
+  cout << "Testing PTree CopyConstructor_operator=..." << endl;
 
   PNG source1;
   source1.readFromFile("originals/mix-3x5.png");
@@ -387,7 +388,7 @@ TEST_CASE("PTree::FlipHorizontal_small", "[weight=1][part=ptree]") {
 }
 
 TEST_CASE("PTree::FlipHorizontal_large", "[weight=1][part=ptree]") {
-  //cout << "Testing PTree FlipHorizontal_large..." << endl;
+  cout << "Testing PTree FlipHorizontal_large..." << endl;
 
   PNG source;
   source.readFromFile("originals/cs-256x224.png");
@@ -406,6 +407,33 @@ TEST_CASE("PTree::FlipHorizontal_large", "[weight=1][part=ptree]") {
   output.writeToFile("images/fliphorizontal-cs.png");
 
   REQUIRE(output == soln_image);
+}
+
+TEST_CASE("PTree::Flip1x2", "[weight=1][part=ptree]") {
+  cout << "Testing 1x2..." << endl;
+  PNG oneByTwo;
+  oneByTwo.readFromFile("originals/Gladge.png");
+
+  oneByTwo.resize(2, 1);
+  for (unsigned x = 0; x < oneByTwo.width(); x++) {
+    for (unsigned y = 0; y < oneByTwo.height(); y++) {
+      cout << "hi" << endl;
+    }
+  }
+  HSLAPixel *pixelOne =  oneByTwo.getPixel(0, 0);
+  HSLAPixel *pixelTwo =  oneByTwo.getPixel(1, 0);
+
+  pixelOne->h = 100;
+  pixelTwo->h = 200;
+
+  PTree tree(oneByTwo);
+
+  cout << "pixelOne before: " << oneByTwo.getPixel(0,0)->h << endl;
+  cout << "pixelTwo before: " << oneByTwo.getPixel(1,0)->h << endl; 
+  tree.FlipHorizontal();
+
+  cout << "pixelOne after: " << oneByTwo.getPixel(0,0)->h << endl;
+  cout << "pixelTwo after: " << oneByTwo.getPixel(1,0)->h << endl;
 }
 
 TEST_CASE("PTree::FlipVertical_small", "[weight=1][part=ptree]") {

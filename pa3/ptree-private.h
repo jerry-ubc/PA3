@@ -21,9 +21,14 @@
 /////////////////////////////////////////////////
 
 Node* CopyNode(Node* node);
-int TreeSize(Node* node) const;
+int TreeSize(const Node* node) const;
+int leafCount(const Node* node) const;
 //void Wender(PNG)
 Node* RenderHelper(Node* node, PNG& png) const;
+<<<<<<< HEAD
 void KILL(Node* node);
+=======
+void mirror(Node* subRoot);
+>>>>>>> eed5c593affebef6798b29c13a6a98314e46ffe1
 
 #endif

@@ -341,10 +341,10 @@ void PTree::Prune(double tolerance) {
 *  You may want to add a recursive helper function for this!
 */
 int PTree::Size() const {
-  return 1 + TreeSize(root->A) + TreeSize(root->B);
+  return TreeSize(root);
 }
 
-int PTree::TreeSize(Node* node) const {
+int PTree::TreeSize(const Node* node) const {
   if(node == nullptr) 
     return 0;
   return 1 + TreeSize(node->A) + TreeSize(node->B);
@@ -358,7 +358,18 @@ int PTree::TreeSize(Node* node) const {
 */
 int PTree::NumLeaves() const {
   // replace the line below with your implementation
-  return -1;
+  return leafCount(root);
+}
+
+int PTree::leafCount(const Node* node) const {
+  if (node == nullptr) {
+    return 0;
+  }
+  if (node->A == nullptr && node->B == nullptr) {
+    return 1;
+  }
+  
+  return leafCount(node->A) + leafCount(node->B);
 }
 
 /*
@@ -374,7 +385,19 @@ int PTree::NumLeaves() const {
 */
 void PTree::FlipHorizontal() {
   // add your implementation below
-  
+  mirror(root);
+}
+
+void PTree::mirror(Node* subRoot)
+{
+    // Base case
+    if (subRoot == NULL) {
+      return;
+    }
+
+    std::swap(subRoot->A, subRoot->B);
+    mirror(subRoot->A);
+    mirror(subRoot->B);
 }
 
 /*
@@ -390,7 +413,7 @@ void PTree::FlipHorizontal() {
 */
 void PTree::FlipVertical() {
   // add your implementation below
-  
+  mirror(root);
 }
 
 /*
