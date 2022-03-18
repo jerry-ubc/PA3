@@ -219,10 +219,12 @@ Node* PTree::CopyNode(Node* node) {
 PTree& PTree::operator=(const PTree& other) {
   if(this->root == other.root)
     return *this;
-  return PTree(other);
+
+  //implement deallocating old memory
+  PTree* copied = new PTree(other);
   
 
-  
+  return *copied;
 }
 
 /*
@@ -246,9 +248,28 @@ PTree::~PTree() {
 *  RETURN: A PNG image of appropriate dimensions and coloured using the tree's leaf node colour data
 */
 PNG PTree::Render() const {
+  if(root == nullptr) {
+    return PNG();
+  }
   PNG png;
-  //IMPLEMENT THIS!
-  return PNG();
+  png.resize(root->width, root->height);
+  cout<<"RESIZED"<<endl;
+  RenderHelper(root, png);
+  cout<<"FINISHED RENDER"<<endl;
+  return png;
+}
+
+Node* PTree::RenderHelper(Node* node, PNG& png) const {
+  if(node == nullptr) {
+    return nullptr;
+  }
+  if(node->width == 1 && node->height == 1) {
+    HSLAPixel* pix = png.getPixel(node->upperleft.first, node->upperleft.second);
+    pix = &node->avg;
+  }
+  RenderHelper(node->A, png);
+  RenderHelper(node->B, png);
+  return node;
 }
 
 /*
