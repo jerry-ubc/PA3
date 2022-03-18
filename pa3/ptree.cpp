@@ -344,7 +344,19 @@ int PTree::leafCount(const Node* node) const {
 */
 void PTree::FlipHorizontal() {
   // add your implementation below
-  
+  mirror(root);
+}
+
+void PTree::mirror(Node* subRoot)
+{
+    // Base case
+    if (subRoot == NULL) {
+      return;
+    }
+
+    std::swap(subRoot->A, subRoot->B);
+    mirror(subRoot->A);
+    mirror(subRoot->B);
 }
 
 /*
@@ -360,7 +372,7 @@ void PTree::FlipHorizontal() {
 */
 void PTree::FlipVertical() {
   // add your implementation below
-  
+  mirror(root);
 }
 
 /*
