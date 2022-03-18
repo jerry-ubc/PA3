@@ -317,7 +317,18 @@ int PTree::TreeSize(const Node* node) const {
 */
 int PTree::NumLeaves() const {
   // replace the line below with your implementation
-  return -1;
+  return leafCount(root);
+}
+
+int PTree::leafCount(const Node* node) const {
+  if (node == nullptr) {
+    return 0;
+  }
+  if (node->A == nullptr && node->B == nullptr) {
+    return 1;
+  }
+  
+  return leafCount(node->A) + leafCount(node->B);
 }
 
 /*

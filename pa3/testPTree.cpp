@@ -215,7 +215,7 @@ TEST_CASE("PTree::Constructor", "[weight=1][part=ptree]") {
 }
 
 TEST_CASE("PTree::Size_NumLeaves", "[weight=1][part=ptree]") {
-  //cout << "Testing PTree Size, NumLeaves..." << endl;
+  cout << "Testing PTree Size, NumLeaves..." << endl;
 
   // manually create a PNG, 3x2
   PNG source;
@@ -234,14 +234,15 @@ TEST_CASE("PTree::Size_NumLeaves", "[weight=1][part=ptree]") {
   PTree tree(source);
 
   int treesize = tree.Size();
+  cout << "tree size is: " << treesize << endl;
   int treenumleaves = tree.NumLeaves();
-
+  cout << "number of leaves: " << treenumleaves << endl;
   REQUIRE(treesize == 11);
   REQUIRE(treenumleaves == 6);
 }
 
 TEST_CASE("PTree::CopyConstructor_operator=", "[weight=1][part=ptree]") {
-  //cout << "Testing PTree CopyConstructor_operator=..." << endl;
+  cout << "Testing PTree CopyConstructor_operator=..." << endl;
 
   PNG source1;
   source1.readFromFile("originals/mix-3x5.png");
