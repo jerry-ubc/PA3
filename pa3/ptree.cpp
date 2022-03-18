@@ -73,7 +73,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     leaf->A = nullptr;
     leaf->B = nullptr;
     leaf->avg = *(im.getPixel(ul.first, ul.second));
-    //cout<<"leaf found for ("<<ul.first<<", " <<ul.second<<")"<<endl;
+    cout<<"leaf found for ("<<ul.first<<", " <<ul.second<<")"<<endl;
     //cout<<"leaf avg: " << leaf->avg<<endl;
     return leaf;
   }
@@ -97,12 +97,12 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     double avgy = a_width * ly/w + b_width * ry/w;
     double avgx2 = -1 * avgx;
     double avgy2 = -1 * avgy;
-    // cout<<"--------------------------------"<<endl;
-    // cout<<up->h <<" and " << dp->h<<endl;
-    // cout<<"(" << a_height <<" * " << ux << " / " << h << ") + (" << b_height<<" * " << dx << " / " << h<< ") = " << avgx <<endl;
-    // cout<<"(" << a_height <<" * " << uy << " / " << h << ") + (" << b_height<<" * " << dy << " / " << h<< ") = " << avgy << endl;
-    // cout<<"final: " << XY2Deg(avgx, avgy)<<endl;
-    // cout<<"--------------------------------"<<endl;
+    cout<<"--------------------------------"<<endl;
+    cout<<up->h <<" and " << dp->h<<endl;
+    cout<<"(" << a_height <<" * " << ux << " / " << h << ") + (" << b_height<<" * " << dx << " / " << h<< ") = " << avgx <<endl;
+    cout<<"(" << a_height <<" * " << uy << " / " << h << ") + (" << b_height<<" * " << dy << " / " << h<< ") = " << avgy << endl;
+    cout<<"final: " << XY2Deg(avgx, avgy)<<endl;
+    cout<<"--------------------------------"<<endl;
     double hue = XY2Deg(avgx, avgy);
     double hue2 = XY2Deg(avgx2, avgy2);
     HSLAPixel pix;
@@ -266,7 +266,7 @@ PTree& PTree::operator=(const PTree& other) {
 *  Deallocates all dynamic memory associated with the tree and destroys this PTree object.
 */
 PTree::~PTree() {
-  KILL(root);
+  //KILL(root);
 }
 
 /*
