@@ -25,6 +25,7 @@ int TreeSize(const Node* node) const;
 int leafCount(const Node* node) const;
 //void Wender(PNG)
 Node* RenderHelper(Node* node, PNG& png) const;
+void KILL(Node* node);
 void mirror(Node* subRoot);
 
 #endif

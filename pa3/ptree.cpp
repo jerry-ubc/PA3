@@ -8,6 +8,7 @@
 
 #include "ptree.h"
 #include "hue_utils.h" // useful functions for calculating hue averages
+#include <assert.h>
 
 using namespace cs221util;
 using namespace std;
@@ -25,8 +26,15 @@ typedef pair<unsigned int, unsigned int> pairUI;
 *  POST: all nodes allocated into the heap have been released.
 */
 void PTree::Clear() {
-  // add your implementation below
-  
+  KILL(root);
+}
+
+void PTree::KILL(Node* node) {
+  if(node) {
+    KILL(node->A);
+    KILL(node->B);
+    delete node;
+  }
 }
 
 /*
@@ -65,6 +73,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     leaf->A = nullptr;
     leaf->B = nullptr;
     leaf->avg = *(im.getPixel(ul.first, ul.second));
+    //cout<<"leaf found for ("<<ul.first<<", " <<ul.second<<")"<<endl;
     //cout<<"leaf avg: " << leaf->avg<<endl;
     return leaf;
   }
@@ -78,23 +87,35 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     cur_node->height = h;
     HSLAPixel* lp = im.getPixel(ul.first, ul.second);
     HSLAPixel* rp = im.getPixel(ul.first + a_width, ul.second);
+    assert(lp->h < 360 && lp-> h >= 0);
+    assert(rp->h < 360 && rp-> h >= 0);
     double lx = Deg2X(lp->h);
     double rx = Deg2X(rp->h);
-    double ly = Deg2X(lp->h);
-    double ry = Deg2X(rp->h);
-    double avgx = (lx + rx) / 2.0;
-    double avgy = (ly + ry) / 2.0;
+    double ly = Deg2Y(lp->h);
+    double ry = Deg2Y(rp->h);
+    double avgx = a_width * lx/w + b_width * rx/w;
+    double avgy = a_width * ly/w + b_width * ry/w;
+    double avgx2 = -1 * avgx;
+    double avgy2 = -1 * avgy;
+    // cout<<"--------------------------------"<<endl;
+    // cout<<up->h <<" and " << dp->h<<endl;
+    // cout<<"(" << a_height <<" * " << ux << " / " << h << ") + (" << b_height<<" * " << dx << " / " << h<< ") = " << avgx <<endl;
+    // cout<<"(" << a_height <<" * " << uy << " / " << h << ") + (" << b_height<<" * " << dy << " / " << h<< ") = " << avgy << endl;
+    // cout<<"final: " << XY2Deg(avgx, avgy)<<endl;
+    // cout<<"--------------------------------"<<endl;
     double hue = XY2Deg(avgx, avgy);
+    double hue2 = XY2Deg(avgx2, avgy2);
     HSLAPixel pix;
-    pix.h = hue;
+    pix.h = min(hue, hue2);
 
     cur_node->A = BuildNode(im, {ul.first, ul.second}, a_width, h);
     cur_node->B = BuildNode(im, {ul.first + a_width, ul.second}, b_width, h);
-    pix.s = (lp->s + rp->s) / 2.0;
-    pix.l = (lp->l + rp->l) / 2.0;
-    pix.a = (lp->a + rp->a) / 2.0;
+    pix.s = lp->s/w + rp->s/w;
+    pix.l = lp->l/w + rp->l/w;
+    pix.a = lp->a/w + rp->a/w;
     cur_node->avg = pix;
-    //cout<<"node avg: " << cur_node->avg<<endl;
+    //cout<<"L EXAMPLE: "<< lp->l <<" / "<< a_width<< " + " << rp->l <<" / " << b_width << " = " << pix.l << endl;
+    //cout<<"ul: ("<<ul.first<<", " << ul.second<<") w: " << w << ", h: " << h <<" || avg: " << cur_node->avg<<endl;
     return cur_node;
   }
   else if (h > w) {
@@ -107,23 +128,36 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     cur_node->height = h;
     HSLAPixel* up = im.getPixel(ul.first, ul.second);
     HSLAPixel* dp = im.getPixel(ul.first, ul.second + a_height);
+    assert(dp->h < 360 && dp-> h >= 0);
+    assert(up->h < 360 && up-> h >= 0);
     double ux = Deg2X(up->h);
     double dx = Deg2X(dp->h);
-    double uy = Deg2X(up->h);
-    double dy = Deg2X(dp->h);
-    double avgx = (ux + dx) / 2.0;
-    double avgy = (uy + dy) / 2.0;
+    double uy = Deg2Y(up->h);
+    double dy = Deg2Y(dp->h);
+    // double avgx = ux/a_height + dx/b_height;
+    // double avgy = uy/a_height + dy/b_height;
+    double avgx = a_height * ux/h + b_height * dx/h;
+    double avgy = a_height * uy/h + b_height * dy/h;
+    double avgx2 = -1 * avgx;
+    double avgy2 = -1 * avgy;
+    // cout<<"--------------------------------"<<endl;
+    // cout<<up->h <<" and " << dp->h<<endl;
+    // cout<<"(" << a_height <<" * " << ux << " / " << h << ") + (" << b_height<<" * " << dx << " / " << h<< ") = " << avgx <<endl;
+    // cout<<"(" << a_height <<" * " << uy << " / " << h << ") + (" << b_height<<" * " << dy << " / " << h<< ") = " << avgy << endl;
+    // cout<<"final: " << XY2Deg(avgx, avgy)<<endl;
+    // cout<<"--------------------------------"<<endl;
     double hue = XY2Deg(avgx, avgy);
+    double hue2 = XY2Deg(avgx2, avgy2);
     HSLAPixel pix;
-    pix.h = hue;
+    pix.h = min(hue, hue2);
 
     cur_node->A = BuildNode(im, {ul.first, ul.second}, w, a_height);
     cur_node->B = BuildNode(im,  {ul.first, ul.second + a_height}, w, b_height);
-    pix.s = (up->s + dp->s) / 2.0;
-    pix.l = (up->l + dp->l) / 2.0;
-    pix.a = (up->a + dp->a) / 2.0;
+    pix.s = up->s/h + dp->s/h;
+    pix.l = up->l/h + dp->l/h;
+    pix.a = up->a/h + dp->a/h;
     cur_node->avg = pix;
-    //cout<<"node avg: " << cur_node->avg<<endl;
+    //cout<<"ul: ("<<ul.first<<", " << ul.second<<") w: " << w << ", h: " << h <<" || avg: " << cur_node->avg<<endl;
     return cur_node;
   }
 }
@@ -179,7 +213,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
 */
 PTree::PTree(PNG& im) {
   root = BuildNode(im, {0, 0}, im.width(), im.height());
-  cout<<"root avg "<< root->avg<<endl;
+  //cout<<"root avg "<< root->avg<<endl;
 }
 
 /*
@@ -223,7 +257,7 @@ PTree& PTree::operator=(const PTree& other) {
   //implement deallocating old memory
   PTree* copied = new PTree(other);
   
-
+  Clear();
   return *copied;
 }
 
@@ -232,8 +266,7 @@ PTree& PTree::operator=(const PTree& other) {
 *  Deallocates all dynamic memory associated with the tree and destroys this PTree object.
 */
 PTree::~PTree() {
-  // add your implementation below
-  
+  KILL(root);
 }
 
 /*
@@ -252,10 +285,14 @@ PNG PTree::Render() const {
     return PNG();
   }
   PNG png;
+  //cout<<"presize"<<endl;
   png.resize(root->width, root->height);
-  cout<<"RESIZED"<<endl;
+  //cout<<"png resized: " << png->width() << ", " << png->height() << endl;
+  //cout<<"STAAAAAAAAAAAARTING RENDERRRRRRRRRRRRRRRRRRRRR"<<endl;
   RenderHelper(root, png);
-  cout<<"FINISHED RENDER"<<endl;
+  //cout<<"FINISHED RENDER"<<endl;
+  //cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
+  //cout<<*(png.getPixel(0,2))<<endl;
   return png;
 }
 
@@ -265,10 +302,14 @@ Node* PTree::RenderHelper(Node* node, PNG& png) const {
   }
   if(node->width == 1 && node->height == 1) {
     HSLAPixel* pix = png.getPixel(node->upperleft.first, node->upperleft.second);
-    pix = &node->avg;
+    //cout<<"pixel: " << *pix <<endl;
+    *pix = (node->avg);
+    //cout<<"newPixel: " << *pix << endl;
   }
-  RenderHelper(node->A, png);
-  RenderHelper(node->B, png);
+  if(node->A != nullptr)
+    node->A = RenderHelper(node->A, png);
+  if(node->B != nullptr)
+    node->B = RenderHelper(node->B, png);
   return node;
 }
 
