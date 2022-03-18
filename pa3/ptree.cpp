@@ -65,6 +65,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     leaf->A = nullptr;
     leaf->B = nullptr;
     leaf->avg = *(im.getPixel(ul.first, ul.second));
+    //cout<<"leaf avg: " << leaf->avg<<endl;
     return leaf;
   }
   if(w > h || w == h) {
@@ -93,7 +94,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     pix.l = (lp->l + rp->l) / 2.0;
     pix.a = (lp->a + rp->a) / 2.0;
     cur_node->avg = pix;
-
+    //cout<<"node avg: " << cur_node->avg<<endl;
     return cur_node;
   }
   else if (h > w) {
@@ -122,7 +123,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     pix.l = (up->l + dp->l) / 2.0;
     pix.a = (up->a + dp->a) / 2.0;
     cur_node->avg = pix;
-
+    //cout<<"node avg: " << cur_node->avg<<endl;
     return cur_node;
   }
 }
@@ -178,6 +179,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
 */
 PTree::PTree(PNG& im) {
   root = BuildNode(im, {0, 0}, im.width(), im.height());
+  cout<<"root avg "<< root->avg<<endl;
 }
 
 /*
@@ -215,9 +217,12 @@ Node* PTree::CopyNode(Node* node) {
 *         Otherwise, there is no change to this tree.
 */
 PTree& PTree::operator=(const PTree& other) {
-  // add your implementation below
+  if(this->root == other.root)
+    return *this;
+  return PTree(other);
+  
 
-  return *this;
+  
 }
 
 /*
