@@ -27,5 +27,6 @@ int leafCount(const Node* node) const;
 Node* RenderHelper(Node* node, PNG& png) const;
 void KILL(Node* node);
 void mirror(Node* subRoot);
+double findAverage(PNG im, pair<unsigned int, unsigned int> ul, unsigned int w, unsigned int h);
 
 #endif

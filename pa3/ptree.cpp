@@ -73,7 +73,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     leaf->A = nullptr;
     leaf->B = nullptr;
     leaf->avg = *(im.getPixel(ul.first, ul.second));
-    cout<<"leaf found for ("<<ul.first<<", " <<ul.second<<")"<<endl;
+    //cout<<"leaf found for ("<<ul.first<<", " <<ul.second<<")"<<endl;
     //cout<<"leaf avg: " << leaf->avg<<endl;
     return leaf;
   }
@@ -85,31 +85,41 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     cur_node->upperleft = ul;
     cur_node->width = w;
     cur_node->height = h;
-    HSLAPixel* lp = im.getPixel(ul.first, ul.second);
-    HSLAPixel* rp = im.getPixel(ul.first + a_width, ul.second);
-    assert(lp->h < 360 && lp-> h >= 0);
-    assert(rp->h < 360 && rp-> h >= 0);
-    double lx = Deg2X(lp->h);
-    double rx = Deg2X(rp->h);
-    double ly = Deg2Y(lp->h);
-    double ry = Deg2Y(rp->h);
-    double avgx = a_width * lx/w + b_width * rx/w;
-    double avgy = a_width * ly/w + b_width * ry/w;
-    double avgx2 = -1 * avgx;
-    double avgy2 = -1 * avgy;
-    cout<<"--------------------------------"<<endl;
-    cout<<up->h <<" and " << dp->h<<endl;
-    cout<<"(" << a_height <<" * " << ux << " / " << h << ") + (" << b_height<<" * " << dx << " / " << h<< ") = " << avgx <<endl;
-    cout<<"(" << a_height <<" * " << uy << " / " << h << ") + (" << b_height<<" * " << dy << " / " << h<< ") = " << avgy << endl;
-    cout<<"final: " << XY2Deg(avgx, avgy)<<endl;
-    cout<<"--------------------------------"<<endl;
-    double hue = XY2Deg(avgx, avgy);
-    double hue2 = XY2Deg(avgx2, avgy2);
-    HSLAPixel pix;
-    pix.h = min(hue, hue2);
+    
 
     cur_node->A = BuildNode(im, {ul.first, ul.second}, a_width, h);
     cur_node->B = BuildNode(im, {ul.first + a_width, ul.second}, b_width, h);
+    // HSLAPixel* lp = im.getPixel(ul.first, ul.second);
+    // HSLAPixel* rp = im.getPixel(ul.first + a_width, ul.second);
+    HSLAPixel* lp = &(cur_node->A->avg);
+    HSLAPixel* rp = &(cur_node->B->avg);
+    assert(lp->h < 360 && lp-> h >= 0);
+    assert(rp->h < 360 && rp-> h >= 0);
+    //average children
+    double hue = findAverage(im, {ul.first, ul.second}, w, h);
+
+
+    // double lx = Deg2X(lp->h);
+    // double rx = Deg2X(rp->h);
+    // double ly = Deg2Y(lp->h);
+    // double ry = Deg2Y(rp->h);
+    // double avgx = a_width * lx/w + b_width * rx/w;
+    // double avgy = a_width * ly/w + b_width * ry/w;
+    // double avgx2 = -1 * avgx;
+    // double avgy2 = -1 * avgy;
+    // cout<<"--------------------------------"<<endl;
+    // cout<<lp->h <<" and " << rp->h<<endl;
+    // cout<<"(" << a_width <<" * " << lx << " / " << w << ") + (" << b_width<<" * " << rx << " / " << w<< ") = " << avgx <<endl;
+    // cout<<"(" << a_width <<" * " << ly << " / " << w << ") + (" << b_width<<" * " << ry << " / " << w<< ") = " << avgy << endl;
+    // cout<<"final: " << XY2Deg(avgx, avgy)<<endl;
+    // cout<<"--------------------------------"<<endl;
+    // double hue = XY2Deg(avgx, avgy);
+    // double hue2 = XY2Deg(avgx2, avgy2);
+    HSLAPixel pix;
+    pix.h = hue;
+
+
+
     pix.s = lp->s/w + rp->s/w;
     pix.l = lp->l/w + rp->l/w;
     pix.a = lp->a/w + rp->a/w;
@@ -126,33 +136,41 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     cur_node->upperleft = ul;
     cur_node->width = w;
     cur_node->height = h;
-    HSLAPixel* up = im.getPixel(ul.first, ul.second);
-    HSLAPixel* dp = im.getPixel(ul.first, ul.second + a_height);
-    assert(dp->h < 360 && dp-> h >= 0);
-    assert(up->h < 360 && up-> h >= 0);
-    double ux = Deg2X(up->h);
-    double dx = Deg2X(dp->h);
-    double uy = Deg2Y(up->h);
-    double dy = Deg2Y(dp->h);
-    // double avgx = ux/a_height + dx/b_height;
-    // double avgy = uy/a_height + dy/b_height;
-    double avgx = a_height * ux/h + b_height * dx/h;
-    double avgy = a_height * uy/h + b_height * dy/h;
-    double avgx2 = -1 * avgx;
-    double avgy2 = -1 * avgy;
-    cout<<"--------------------------------"<<endl;
-    cout<<up->h <<" and " << dp->h<<endl;
-    cout<<"(" << a_height <<" * " << ux << " / " << h << ") + (" << b_height<<" * " << dx << " / " << h<< ") = " << avgx <<endl;
-    cout<<"(" << a_height <<" * " << uy << " / " << h << ") + (" << b_height<<" * " << dy << " / " << h<< ") = " << avgy << endl;
-    cout<<"final: " << XY2Deg(avgx, avgy)<<endl;
-    cout<<"--------------------------------"<<endl;
-    double hue = XY2Deg(avgx, avgy);
-    double hue2 = XY2Deg(avgx2, avgy2);
-    HSLAPixel pix;
-    pix.h = min(hue, hue2);
+    
+    
 
     cur_node->A = BuildNode(im, {ul.first, ul.second}, w, a_height);
     cur_node->B = BuildNode(im,  {ul.first, ul.second + a_height}, w, b_height);
+
+
+
+    // HSLAPixel* up = im.getPixel(ul.first, ul.second);
+    // HSLAPixel* dp = im.getPixel(ul.first, ul.second + a_height);
+    HSLAPixel* up = &(cur_node->A->avg);
+    HSLAPixel* dp = &(cur_node->B->avg);
+    // assert(dp->h < 360 && dp-> h >= 0);
+    // assert(up->h < 360 && up-> h >= 0);
+    // double ux = Deg2X(up->h);
+    // double dx = Deg2X(dp->h);
+    // double uy = Deg2Y(up->h);
+    // double dy = Deg2Y(dp->h);
+    // // double avgx = ux/a_height + dx/b_height;
+    // // double avgy = uy/a_height + dy/b_height;
+    // double avgx = a_height * ux/h + b_height * dx/h;
+    // double avgy = a_height * uy/h + b_height * dy/h;
+    // double avgx2 = -1 * avgx;
+    // double avgy2 = -1 * avgy;
+    // double hue = XY2Deg(avgx, avgy);
+    // double hue2 = XY2Deg(avgx2, avgy2);
+    double hue = findAverage(im, {ul.first, ul.second}, w, h);
+    HSLAPixel pix;
+    pix.h = hue;
+    // cout<<"--------------------------------"<<endl;
+    // cout<<up->h <<" and " << dp->h<<endl;
+    // cout<<"(" << a_height <<" * " << ux << " / " << h << ") + (" << b_height<<" * " << dx << " / " << h<< ") = " << avgx <<endl;
+    // cout<<"(" << a_height <<" * " << uy << " / " << h << ") + (" << b_height<<" * " << dy << " / " << h<< ") = " << avgy << endl;
+    // cout<<"final: " << pix.h <<endl;
+    // cout<<"--------------------------------"<<endl;
     pix.s = up->s/h + dp->s/h;
     pix.l = up->l/h + dp->l/h;
     pix.a = up->a/h + dp->a/h;
@@ -161,6 +179,28 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
     return cur_node;
   }
 }
+
+double PTree::findAverage(PNG im, pair<unsigned int, unsigned int> ul, unsigned int w, unsigned int h) {
+  double x_comp = 0;
+  double y_comp = 0;
+  //cout<<"----------- w: " << w << ", h: " << h << "       and starts ("<<ul.first<<", " <<ul.second<<")"<<endl;
+  for(unsigned int i = 0; i < w; i++) {
+    for(unsigned int j = 0; j < h; j++) {
+      //cout<<"adding x: " << Deg2X(im.getPixel(ul.first + i, ul.second + j)->h) << "        adding y: " << Deg2Y(im.getPixel(ul.first + i, ul.second + j)->h) << endl;
+      x_comp += Deg2X(im.getPixel(ul.first + i, ul.second + j)->h);
+      y_comp += Deg2Y(im.getPixel(ul.first + i, ul.second + j)->h);
+    }
+  }
+  double xavg = x_comp / (w*h);
+  double yavg = y_comp / (w*h);
+  double hue = XY2Deg(xavg, yavg);
+  double hue2 = XY2Deg(-1 * xavg, -1 * yavg);
+  //cout<<"xavg: " << xavg<< ", yavg: "<<yavg<<endl;
+  //cout<<"return "<< min(hue, hue2) << endl;;
+  return hue;
+}
+
+
 
 ////////////////////////////////
 // PTree public member functions
@@ -213,7 +253,7 @@ Node* PTree::BuildNode(PNG& im, pair<unsigned int, unsigned int> ul, unsigned in
 */
 PTree::PTree(PNG& im) {
   root = BuildNode(im, {0, 0}, im.width(), im.height());
-  //cout<<"root avg "<< root->avg<<endl;
+  cout<<"root avg "<< root->avg<<endl;
 }
 
 /*
